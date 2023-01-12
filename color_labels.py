@@ -320,12 +320,15 @@ for i in range(len(label_coordinates)):
     labelColors.append(pbca.find_maximum_distance(background_image, neighboringPixelCoordinates, palette))
 
 # Color each pixel in the label text with the inverse HSV values
-background_image2 = background_image.copy()[:,:,:3]
+background_image2 = np.dstack((background_image.copy()[:,:,:3], 255*np.ones((background_image.shape[0], background_image.shape[1]))))
 for i in range(len(label_coordinates)):
     coord = label_coordinates[i]
     # label_rgb = hsv_to_rgb(label_hsv[i])
     label_rgb = labelColors[i]
-    background_image2[coord[0], coord[1],:] = label_rgb
+    # background_image2[coord[0], coord[1],:3] = np.asarray([0,0,0]) #set all label pixel colors to black (for testing only)
+    background_image2[coord[0], coord[1],0] = label_rgb[0]
+    background_image2[coord[0], coord[1],1] = label_rgb[1]
+    background_image2[coord[0], coord[1],2] = label_rgb[2]
 
 # Blur borders between color patches
 # blurred_image = cv2.blur(background_image2, (5, 5))
@@ -334,8 +337,13 @@ for i in range(len(label_coordinates)):
 #     label_blurred = blurred_image[coord[0], coord[1],:]
 #     background_image2[coord[0], coord[1],:] = label_blurred
 
-
-pt.imsave("./results/"+background_name+"_palette_based.jpg", background_image2/255)
+background_image2 = background_image2/255
+#Check that label colors are assigned correctly when all label pixel colors are set to black
+for j in range(len(label_coordinates)):
+    coord = label_coordinates[j]
+    if (background_image2[coord[0], coord[1],0] != 0) or (background_image2[coord[0], coord[1],1] != 0) or (background_image2[coord[0], coord[1],2] != 0) or (background_image2[coord[0], coord[1],3] != 1):
+        print(background_image2[coord[0], coord[1],:])
+pt.imsave("./results/"+background_name+"_palette_based.jpg", background_image2)
 # # pt.show()
 
 
