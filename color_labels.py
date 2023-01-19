@@ -5,6 +5,7 @@ import cv2
 import math
 import palette_based_color_assignment as pbca
 
+
 '''
 Generate a label color based on one of the 2 methods using the HSV color space
 '''
@@ -292,21 +293,25 @@ label_coordinates = coordinates[:, label_pixels]
 label_coordinates = np.array(list(zip(label_coordinates[0,:], label_coordinates[1,:])))
 
 # Derive variance map
-value_variance_map = sample_pixels(background_image_hsv, 50)
+# value_variance_map = sample_pixels(background_image_hsv, 50)
 # pt.imshow(value_variance_map, cmap = "gray")
 
 
 # # Get hsv values of pixels at the corresponding coordinates from the background image
-background_hsv = [background_image_hsv[coord[0], coord[1], :] for coord in label_coordinates]
+# background_hsv = [background_image_hsv[coord[0], coord[1], :] for coord in label_coordinates]
 
-selected_value_variances = [value_variance_map[coord[0], coord[1]] for coord in label_coordinates]
+# selected_value_variances = [value_variance_map[coord[0], coord[1]] for coord in label_coordinates]
 
 
 # Get hsl values of pixels at the corresponding coordinates from the background image
 # background_hsl = [background_image_hsl[coord[0], coord[1], :] for coord in label_coordinates]
 
+# Convert the background image to a CIEXYZ image
+# sample_background = np.asarray(Image.open('./img/John_Hay_Sampled.png'))[:,:,:3]
+# background_ciexyz = np.apply_along_axis(rgb_to_ciexyz, 2, background_image)
+
 # Generate inverse HSV values of extracted pixel values
-label_hsv = [invert_hsv(background_hsv[i], selected_value_variances[i], np.percentile(value_variance_map, 95)) for i in range(len(background_hsv))]
+# label_hsv = [invert_hsv(background_hsv[i], selected_value_variances[i], np.percentile(value_variance_map, 95)) for i in range(len(background_hsv))]
 
 # Generate inverse HSL values of extracted pixel values
 # label_hsl = [invert_hsl(val) for val in background_hsl]
@@ -321,6 +326,7 @@ for i in range(len(label_coordinates)):
 
 # Color each pixel in the label text with the inverse HSV values
 background_image2 = np.dstack((background_image.copy()[:,:,:3], 255*np.ones((background_image.shape[0], background_image.shape[1]))))
+# background_image2 = np.zeros(background_image.shape)
 for i in range(len(label_coordinates)):
     coord = label_coordinates[i]
     # label_rgb = hsv_to_rgb(label_hsv[i])
@@ -329,6 +335,8 @@ for i in range(len(label_coordinates)):
     background_image2[coord[0], coord[1],0] = label_rgb[0]
     background_image2[coord[0], coord[1],1] = label_rgb[1]
     background_image2[coord[0], coord[1],2] = label_rgb[2]
+    # background_image2[coord[0], coord[1],3] = 255
+
 
 # Blur borders between color patches
 # blurred_image = cv2.blur(background_image2, (5, 5))
@@ -338,12 +346,15 @@ for i in range(len(label_coordinates)):
 #     background_image2[coord[0], coord[1],:] = label_blurred
 
 background_image2 = background_image2/255
-#Check that label colors are assigned correctly when all label pixel colors are set to black
+
+#Check that label colors are assigned correctly 
 for j in range(len(label_coordinates)):
     coord = label_coordinates[j]
-    if (background_image2[coord[0], coord[1],0] != 0) or (background_image2[coord[0], coord[1],1] != 0) or (background_image2[coord[0], coord[1],2] != 0) or (background_image2[coord[0], coord[1],3] != 1):
-        print(background_image2[coord[0], coord[1],:])
-pt.imsave("./results/"+background_name+"_palette_based.jpg", background_image2)
+    pixel_color = background_image2[coord[0], coord[1],:]
+    for i in range(3):
+        if pixel_color[i] != 0 and pixel_color[i] != 1:
+            print('wrong label pixel color')
+pt.imsave("./results/"+background_name+"_palette_based.png", background_image2)
 # # pt.show()
 
 
