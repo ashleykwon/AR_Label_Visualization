@@ -36,8 +36,6 @@ while(True):
 
     # add text on top of image using alpha matte
     composite = contrast_text * text_matte + frame * (1 - text_matte)   
-    
-    # displa
     cv2.imshow('frame', composite)
 
     # press 'q' to quit
