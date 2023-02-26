@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from contrast import increase_contrast
+from contrast import increase_contrast_HSV
   
 TEXT_SCALE = 5
 TEXT_THICKNESS = 20
@@ -32,7 +32,7 @@ while(True):
     text_matte = np.repeat(text[:, :, 0], 3).reshape(text.shape)
 
     # use our custom function to increase contrast of text pixels
-    contrast_text = increase_contrast(frame, text)
+    contrast_text = increase_contrast_HSV(frame)
 
     # add text on top of image using alpha matte
     composite = contrast_text * text_matte + frame * (1 - text_matte)   

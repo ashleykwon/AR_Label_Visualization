@@ -5,9 +5,7 @@ from skimage import io, color
 '''
 Increases the contrast using HSV color space, inverting L value and using constant H and S
 '''
-def increase_contrast_HSV(bg, text, hue=0.33, sat=0.8):
-    matte = np.repeat(text[:, :, 0], 3).reshape(text.shape)
-
+def increase_contrast_HSV(bg, hue=0.33, sat=0.8):
     bg_hsv = color.rgb2hsv(bg)
     v = bg_hsv[:, :, -1].copy()
     v = np.round(v)
@@ -20,14 +18,12 @@ def increase_contrast_HSV(bg, text, hue=0.33, sat=0.8):
     # convert back and blur it
     bg_rgb = color.hsv2rgb(bg_hsv)
     bg_rgb = cv2.GaussianBlur(bg_rgb,(35,35), 10)
-    return bg_rgb * matte
+    return bg_rgb
 
 '''
 Increases contrast using LAB color space, inverting the L value and keeping other values the same
 '''
-def increase_contrast_LAB(bg, text):
-    matte = np.repeat(text[:, :, 0], 3).reshape(text.shape)
-
+def increase_contrast_CIELAB(bg):
     bg_lab = color.rgb2lab(bg)
     bg_lab[:, :, 1:] *= -1
 
@@ -46,4 +42,4 @@ def increase_contrast_LAB(bg, text):
     
     bg_inverted_rgb = color.lab2rgb(bg_lab)
 
-    return bg_inverted_rgb * matte
+    return bg_inverted_rgb
