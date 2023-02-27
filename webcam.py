@@ -33,7 +33,7 @@ while(True):
     text_matte = np.repeat(text[:, :, 0], 3).reshape(text.shape)
 
     # use our custom function to increase contrast of text pixels
-    contrast_bg = contrast.maximize_contrast_CIELAB(frame, 0.2)
+    contrast_bg = contrast.maximize_contrast_CIELAB(frame, scale=0.2, goal=np.array([.25, .52, .96]), interp=0.5)
     contrast_bg = cv2.GaussianBlur(contrast_bg, (blur_amt, blur_amt), 10)
 
     # add text on top of image using alpha matte

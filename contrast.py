@@ -48,15 +48,19 @@ def increase_contrast_CIELAB(bg, hue=0.33, sat=0.8):
 """
 Tries to find the furthest possible color in CIELAB space from each pixel in the image
 """
-def maximize_contrast_CIELAB(bg, scale=0.1):
+def maximize_contrast_CIELAB(bg, scale=0.1, goal=None, interp=1):
     # convert to LAB space
     bg_lab = color.rgb2lab(bg)
     
     # finding opposite of every color is slow so reduce resolution by some scale factor
     bg_lab = cv2.resize(bg_lab, (int(bg.shape[0] * scale), int(bg.shape[1] * scale)))
-    contrast_bg = cielab_boundary.maximize_contrast(bg_lab)
+    contrast_bg = cielab_boundary.maximize_contrast(bg_lab) #, goal=goal, thresh=thresh)
     contrast_bg = cv2.resize(contrast_bg, (bg.shape[1], bg.shape[0]))
+    
+    if goal is not None:
+        goal = color.rgb2lab(goal[::-1]) # not sure why it has to be backwards
+        print(goal)
+        contrast_bg = contrast_bg * (1 - interp) + goal * interp
 
     bg_rgb = color.lab2rgb(contrast_bg)
- 
     return bg_rgb
