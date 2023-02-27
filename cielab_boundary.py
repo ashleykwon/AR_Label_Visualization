@@ -1,17 +1,18 @@
-"""
-Goal: Maxmize color distance in CIELAB space
-Idea: 
-- The distance to a given point in CIELAB will be on the boundary of the space.
-- We can determine the boundary of CIELAB based on the error of converting to RGB and back
-  (may be a better approach?)
-- Then find the point on this boundary that maximizes the distance
-
-"""
 import numpy as np
 from skimage import color
 from matplotlib import pyplot as plt
 from matplotlib import cm
 from scipy.ndimage import sobel
+
+"""
+Goal: Maxmize color distance in CIELAB space
+Idea: 
+- The distance to a given point in CIELAB will be on the boundary of the space.
+- We can determine the boundary of CIELAB based on the error of converting to RGB and back
+  (Is there a better approach?)
+- Then find the point on this boundary that maximizes the distance
+
+"""
 
 error_threshold = 1e-6
 res = 10 # resolution of points from CIELAB space
@@ -47,7 +48,8 @@ def maximize_contrast(img, goal=None, thresh=500):
         candidates = candidates[np.sum((goal - candidates) ** 2, axis=1) < thresh * thresh]
 
     # vectorize computation of subtracting each element
-    repeated = candidates.repeat((img.shape[0] * img.shape[1])).reshape((*candidates.shape, img.shape[1], img.shape[0]))
+    repeated = candidates.repeat((img.shape[0] * img.shape[1])) \
+                         .reshape((*candidates.shape, img.shape[1], img.shape[0]))
     distsq = np.sum((img.T - repeated)**2, axis=1)
     index = np.argmax(distsq, axis=0)
     contrast_bg = candidates[index.T]
@@ -55,7 +57,7 @@ def maximize_contrast(img, goal=None, thresh=500):
     return contrast_bg
 
 # Code for plotting the boundary, was useful in verifying that 
-# convolution method was working:
+# convolution method was working, only run when not importing as module
 if __name__ == '__main__':
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection='3d')
@@ -64,16 +66,13 @@ if __name__ == '__main__':
 
     ax.scatter(boundary[:, 0], boundary[:, 1], boundary[:, 2], marker='.', s=50, color=colors)
     
-    red = color.rgb2lab([1., 0., 0.])
-    green = color.rgb2lab([0., 1., 0.])
-    blue = color.rgb2lab([0., 0., 1.])
+    # RGB primary colors for reference
+    rgb = color.rgb2lab([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
 
-    ax.scatter([red[0], green[0], blue[0]], [red[1], green[1], blue[1]], [red[2], green[2], blue[2]], color=["red", "green", "blue"], s=200)
+    ax.scatter(rgb[:, 0], rgb[:, 1], rgb[:, 2], color=["red", "green", "blue"], s=200)
     
     ax.set_title("Boundary of LAB colorspace")
     ax.set_xlabel('L*')
     ax.set_ylabel('a*')
-    ax.set_ylabel('b*')
-    
-    # displaying plot
+    ax.set_zlabel('b*')
     plt.show()

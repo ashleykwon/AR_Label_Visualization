@@ -22,7 +22,7 @@ def increase_contrast_HSV(bg, hue=0.33, sat=0.8):
 '''
 Increases contrast using LAB color space, inverting the L value and keeping other values the same
 '''
-def increase_contrast_CIELAB(bg, hue=0.33, sat=0.8):
+def increase_contrast_CIELAB_naive(bg, hue=0.33, sat=0.8):
     desired_col = color.rgb2lab(color.hsv2rgb([hue, sat, 1])) # convert desired color to CIELAB
 
     bg_lab = color.rgb2lab(bg)
@@ -48,7 +48,7 @@ def increase_contrast_CIELAB(bg, hue=0.33, sat=0.8):
 """
 Tries to find the furthest possible color in CIELAB space from each pixel in the image
 """
-def maximize_contrast_CIELAB(bg, scale=0.1, goal=None, interp=1):
+def increase_contrast_CIELAB(bg, scale=0.1, goal=None, interp=1):
     # convert to LAB space
     bg_lab = color.rgb2lab(bg)
     

@@ -2,11 +2,17 @@ import cv2
 import numpy as np
 import contrast
   
+"""
+Demo for creating visible text against video from the webcam
+"""
+
 TEXT_SCALE = 5
 TEXT_THICKNESS = 20
 
 vid = cv2.VideoCapture(0)
 blur_amt = 85
+goal_color = np.array([.25, .52, .96])
+interp = 0.5
 
 while(True):
     ret, frame = vid.read()
@@ -33,7 +39,7 @@ while(True):
     text_matte = np.repeat(text[:, :, 0], 3).reshape(text.shape)
 
     # use our custom function to increase contrast of text pixels
-    contrast_bg = contrast.maximize_contrast_CIELAB(frame, scale=0.2, goal=np.array([.25, .52, .96]), interp=0.5)
+    contrast_bg = contrast.maximize_contrast_CIELAB(frame, scale=0.2, goal=goal_color, interp=interp)
     contrast_bg = cv2.GaussianBlur(contrast_bg, (blur_amt, blur_amt), 10)
 
     # add text on top of image using alpha matte
